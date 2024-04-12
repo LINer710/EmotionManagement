@@ -1,0 +1,12 @@
+<resources>
+    <string name="logout">退出登录</string>
+    <string name="nickname">昵称</string>
+    <string-array name="options">
+        <item>修改密码</item>
+        <item>色彩主题</item>
+        <item>字体大小</item>
+        <item>用户协议</item>
+        <item>隐私政策</item>
+        <item>注销账号</item>
+    </string-array>
+</resources>

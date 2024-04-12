@@ -1,7 +1,9 @@
 package com.example.emotionmanagement.ui.login;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -175,6 +177,7 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d("CXL", "Message: " + message);
                             if (message.equals("登录成功")) {
                                 // 登录成功
+                                getUserId(username);
                                 Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                                 // 进入主界面或其他操作
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -250,6 +253,68 @@ public class LoginActivity extends AppCompatActivity {
         if (clickListener != null) {
             textView.setOnClickListener(clickListener);
         }
+    }
+
+    private void getUserId(String username) {
+        OkHttpClient client = new OkHttpClient();
+
+        // 构建 GET 请求
+        Request request = new Request.Builder()
+                .url("http://192.168.68.170:5000/get_user_id?username=" + username)
+                .build();
+
+        // 打印请求信息
+        Log.d("CXL", "Sending get user id request to server...");
+
+        // 异步执行请求
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                // 处理请求失败
+                Log.e("CXL", "Request failed: " + e.getMessage());
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LoginActivity.this, "无法连接到服务器", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                // 处理服务器响应
+                final String responseData = response.body().string();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            JSONObject jsonObject = new JSONObject(responseData);
+                            if (jsonObject.has("user_id")) {
+                                int userId = jsonObject.getInt("user_id");
+                                Log.d("CXL", "User ID: " + userId);
+                                // 保存用户ID到SharedPreferences
+                                saveUserIdToSharedPreferences(userId);
+                            } else {
+                                String message = jsonObject.getString("message");
+                                Log.e("CXL", "Failed to get user ID: " + message);
+                            }
+                        } catch (JSONException e) {
+                            Log.e("CXL", "JSON parsing error: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    // 保存用户ID到SharedPreferences
+    private void saveUserIdToSharedPreferences(int userId) {
+        SharedPreferences sharedPref = getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt("user_id", userId);
+        editor.apply();
     }
 }
 

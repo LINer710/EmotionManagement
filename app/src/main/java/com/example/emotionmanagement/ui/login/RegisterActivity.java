@@ -72,16 +72,16 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void performRegister(String username, String password) {
         OkHttpClient client = new OkHttpClient();
-        if (username.length() < 6) {
-            Toast.makeText(RegisterActivity.this, "用户名不能少于6个字符", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // 检查密码长度和复杂度
-        if (password.length() < 6 || !isPasswordValid(password)) {
-            Toast.makeText(RegisterActivity.this, "密码必须包含字母和数字，并且不少于6个字符", Toast.LENGTH_SHORT).show();
-            return;
-        }
+//        if (username.length() < 6) {
+//            Toast.makeText(RegisterActivity.this, "用户名不能少于6个字符", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        // 检查密码长度和复杂度
+//        if (password.length() < 6 || !isPasswordValid(password)) {
+//            Toast.makeText(RegisterActivity.this, "密码必须包含字母和数字，并且不少于6个字符", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
         // 构建请求体，包含用户名和密码的哈希值
         JSONObject jsonBody = new JSONObject();
@@ -139,7 +139,16 @@ public class RegisterActivity extends AppCompatActivity {
                                 Toast.makeText(RegisterActivity.this, "注册失败", Toast.LENGTH_SHORT).show();
                             }
                         } catch (JSONException e) {
-                            Log.e("CXL", "JSON parsing error: " + e.getMessage());
+                            Log.e("CXL", "JSON parsing error: " +response);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(RegisterActivity.this, "用户重复，请重新注册~", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            editTextUsername.setText("");
+                            editTextPassword.setText("");
+                            editTextConfirmPassword.setText("");
                             e.printStackTrace();
                         }
                     }
