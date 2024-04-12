@@ -1,0 +1,25 @@
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_diary">
+
+    <fragment
+        android:id="@+id/navigation_diary"
+        android:name="com.example.emotionmanagement.ui.main.fragment.DiaryFragment"
+        android:label="Diary"
+        tools:layout="@layout/fragment_diary" />
+
+    <fragment
+        android:id="@+id/navigation_emotionManage"
+        android:name="com.example.emotionmanagement.ui.main.fragment.EmotionManageFragment"
+        android:label="EmotionManage"
+        tools:layout="@layout/fragment_emotion_manage" />
+
+    <fragment
+        android:id="@+id/navigation_personalCenter"
+        android:name="com.example.emotionmanagement.ui.main.fragment.PersonalCenterFragment"
+        android:label="PersonalCenterFragment"
+        tools:layout="@layout/fragment_personal_center" />
+
+</navigation>

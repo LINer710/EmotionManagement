@@ -22,6 +22,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.emotionmanagement.R;
+import com.example.emotionmanagement.ui.main.MainActivity;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -113,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void performLogin(String username, String password) {
         OkHttpClient client = new OkHttpClient();
-        // 检查用户名长度
+      /*  // 检查用户名长度
         if (username.length() < 6) {
             Toast.makeText(LoginActivity.this, "用户名不能少于6个字符", Toast.LENGTH_SHORT).show();
             return;
@@ -123,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
         if (password.length() < 6 || !isPasswordValid(password)) {
             Toast.makeText(LoginActivity.this, "密码必须包含字母和数字，并且不少于6个字符", Toast.LENGTH_SHORT).show();
             return;
-        }
+        }*/
 
         // 构建请求体，包含用户名和密码的哈希值
         JSONObject jsonBody = new JSONObject();
@@ -176,6 +177,8 @@ public class LoginActivity extends AppCompatActivity {
                                 // 登录成功
                                 Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                                 // 进入主界面或其他操作
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
                             } else {
                                 // 登录失败
                                 Toast.makeText(LoginActivity.this, "用户名或密码无效", Toast.LENGTH_SHORT).show();
