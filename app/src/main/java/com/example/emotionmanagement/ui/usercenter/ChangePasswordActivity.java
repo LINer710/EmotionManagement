@@ -4,14 +4,18 @@ import static androidx.core.content.ContentProviderCompat.requireContext;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.emotionmanagement.R;
 
 import org.json.JSONException;
@@ -29,8 +33,8 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
     private EditText editTextOldPassword, editTextNewPassword;
     private Button buttonUpdatePassword;
+    private ImageView imageViewLogo; // 添加 ImageView
     int userId;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,10 @@ public class ChangePasswordActivity extends AppCompatActivity {
         editTextOldPassword = findViewById(R.id.editTextOldPassword);
         editTextNewPassword = findViewById(R.id.editTextNewPassword);
         buttonUpdatePassword = findViewById(R.id.buttonUpdatePassword);
+        imageViewLogo = findViewById(R.id.imageViewLogo);
+
+        // 加载本地头像
+        loadUserAvatar();
 
         buttonUpdatePassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,5 +114,23 @@ public class ChangePasswordActivity extends AppCompatActivity {
                 }).start();
             }
         });
+    }
+
+    private void loadUserAvatar() {
+        SharedPreferences sharedPref = getSharedPreferences("user_info", MODE_PRIVATE);
+        String avatarUrl = sharedPref.getString("avatar_url", "");
+        Log.d("CXL", "avatarUrl" + avatarUrl);
+
+        if (!TextUtils.isEmpty(avatarUrl)) {
+            // 如果本地存在头像URL，直接加载
+            Glide.with(this)
+                    .load(avatarUrl)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(imageViewLogo);
+        } else {
+            // 否则显示默认头像
+            imageViewLogo.setImageResource(R.drawable.img_logo);
+
+        }
     }
 }

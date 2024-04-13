@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,7 +70,7 @@ public class PersonalCenterFragment extends Fragment {
         // 初始化昵称 TextView
         nicknameTextView = rootView.findViewById(R.id.nickname);
 
-        ImageView changePasswordImageView = rootView.findViewById(R.id.change_password_icon);
+        RelativeLayout changePasswordImageView = rootView.findViewById(R.id.change_password);
 
         // 从本地加载用户信息
         loadLocalUserInfo();
@@ -134,6 +135,7 @@ public class PersonalCenterFragment extends Fragment {
             }
 
             String avatarUrl = sharedPref.getString("avatar_url", "");
+            Log.d("CXL", "个人中心本地头像" + avatarUrl);
 
             if (!TextUtils.isEmpty(avatarUrl)) {
                 // 如果本地存在头像URL，直接加载
@@ -310,6 +312,10 @@ public class PersonalCenterFragment extends Fragment {
                                             .load(avatarUrl)
                                             .apply(RequestOptions.circleCropTransform())
                                             .into(profileImageView);
+                                    // 本地存储
+                                    SharedPreferences.Editor editor = requireActivity().getSharedPreferences("user_info", requireContext().MODE_PRIVATE).edit();
+                                    editor.putString("avatar_url", avatarUrl);
+                                    editor.apply();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
