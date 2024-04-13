@@ -1,5 +1,6 @@
 package com.example.emotionmanagement.ui.main.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.emotionmanagement.R;
+import com.example.emotionmanagement.ui.usercenter.ChangePasswordActivity;
 import com.example.emotionmanagement.util.DebounceUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -67,6 +69,8 @@ public class PersonalCenterFragment extends Fragment {
         // 初始化昵称 TextView
         nicknameTextView = rootView.findViewById(R.id.nickname);
 
+        ImageView changePasswordImageView = rootView.findViewById(R.id.change_password_icon);
+
         // 从本地加载用户信息
         loadLocalUserInfo();
 
@@ -96,10 +100,25 @@ public class PersonalCenterFragment extends Fragment {
             }
         });
 
+        changePasswordImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DebounceUtils.debounce(new Runnable() {
+                    public void run() {
+                        // 显示密码修改对话框
+                        Intent intent = new Intent(requireContext(), ChangePasswordActivity.class);
+                        startActivity(intent);
+                    }
+                });
+            }
+        });
+
         return rootView;
     }
 
-    // 从本地加载用户信息
+    /**
+     * 从本地加载用户信息
+     */
     private void loadLocalUserInfo() {
         SharedPreferences sharedPref = requireActivity().getSharedPreferences("user_info", requireContext().MODE_PRIVATE);
         userId = sharedPref.getInt("user_id", -1);
@@ -131,7 +150,10 @@ public class PersonalCenterFragment extends Fragment {
         }
     }
 
-    // 显示修改昵称对话框
+
+    /**
+     * 显示修改昵称对话框
+     */
     private void showChangeNicknameDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("修改昵称");
@@ -164,7 +186,12 @@ public class PersonalCenterFragment extends Fragment {
         builder.show(); // 显示对话框
     }
 
-    // 更新昵称
+
+    /**
+     * 更新昵称
+     *
+     * @param newNickname
+     */
     private void updateNickname(String newNickname) {
         // 发送更新昵称的网络请求
         OkHttpClient client = new OkHttpClient();
@@ -225,7 +252,10 @@ public class PersonalCenterFragment extends Fragment {
         });
     }
 
-    // 加载用户头像
+
+    /**
+     * 加载用户头像
+     */
     private void loadUserAvatar() {
         if (userId != -1) {
             String avatarUrl = "http://192.168.68.170:5000/get_avatar/" + userId;
@@ -297,7 +327,9 @@ public class PersonalCenterFragment extends Fragment {
     }
 
 
-    // 打开图库选择图片
+    /**
+     * 打开图库选择图片
+     */
     private void openImageChooser() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
@@ -320,7 +352,11 @@ public class PersonalCenterFragment extends Fragment {
         }
     }
 
-    // 更新用户头像
+    /**
+     * 更新用户头像
+     *
+     * @param newAvatarUrl
+     */
     private void updateAvatar(String newAvatarUrl) {
         SharedPreferences sharedPref = requireActivity().getSharedPreferences("user_info", requireContext().MODE_PRIVATE);
         int userId = sharedPref.getInt("user_id", -1);

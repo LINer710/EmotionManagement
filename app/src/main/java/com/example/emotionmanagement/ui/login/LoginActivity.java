@@ -146,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
 
         // 打印请求信息
-        Log.d("CXL", "Sending login request to server...");
+//        Log.d("CXL", "Sending login request to server...");
 
         // 异步执行请求
         client.newCall(request).enqueue(new Callback() {
@@ -173,8 +173,8 @@ public class LoginActivity extends AppCompatActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(responseData);
                             String message = jsonObject.getString("message");
-                            Log.d("CXL", "Response: " + responseData);
-                            Log.d("CXL", "Message: " + message);
+//                            Log.d("CXL", "Response: " + responseData);
+//                            Log.d("CXL", "Message: " + message);
                             if (message.equals("登录成功")) {
                                 // 登录成功
                                 getUserId(username);
@@ -264,7 +264,7 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
 
         // 打印请求信息
-        Log.d("CXL", "Sending get user id request to server...");
+//        Log.d("CXL", "Sending get user id request to server...");
 
         // 异步执行请求
         client.newCall(request).enqueue(new Callback() {
@@ -292,7 +292,7 @@ public class LoginActivity extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(responseData);
                             if (jsonObject.has("user_id")) {
                                 int userId = jsonObject.getInt("user_id");
-                                Log.d("CXL", "User ID: " + userId);
+//                                Log.d("CXL", "User ID: " + userId);
                                 // 保存用户ID到SharedPreferences
                                 saveUserIdToSharedPreferences(userId);
                             } else {

@@ -45,7 +45,6 @@
 
         <!-- 修改密码 -->
         <RelativeLayout
-            android:id="@+id/change_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackground"
@@ -61,6 +60,7 @@
                 android:layout_centerVertical="true"/>
 
             <ImageView
+                android:id="@+id/change_password_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_alignParentEnd="true"

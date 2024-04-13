@@ -101,7 +101,7 @@ public class RegisterActivity extends AppCompatActivity {
                 .build();
 
         // 打印请求信息
-        Log.d("CXL", "Sending registration request to server...");
+//        Log.d("CXL", "Sending registration request to server...");
 
         // 异步执行请求
         client.newCall(request).enqueue(new Callback() {
@@ -128,8 +128,8 @@ public class RegisterActivity extends AppCompatActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(responseData);
                             String message = jsonObject.getString("message");
-                            Log.d("CXL", "Response: " + responseData);
-                            Log.d("CXL", "Message: " + message);
+//                            Log.d("CXL", "Response: " + responseData);
+//                            Log.d("CXL", "Message: " + message);
                             if (message.equals("用户注册成功")) {
                                 // 注册成功
                                 Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
