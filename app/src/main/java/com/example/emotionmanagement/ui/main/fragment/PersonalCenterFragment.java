@@ -26,6 +26,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.emotionmanagement.R;
 import com.example.emotionmanagement.ui.usercenter.ChangePasswordActivity;
+import com.example.emotionmanagement.ui.usercenter.ThemeActivity;
 import com.example.emotionmanagement.util.DebounceUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -71,6 +72,7 @@ public class PersonalCenterFragment extends Fragment {
         nicknameTextView = rootView.findViewById(R.id.nickname);
 
         RelativeLayout changePasswordImageView = rootView.findViewById(R.id.change_password);
+        RelativeLayout changeThemeImageView = rootView.findViewById(R.id.change_theme);
 
         // 从本地加载用户信息
         loadLocalUserInfo();
@@ -108,6 +110,18 @@ public class PersonalCenterFragment extends Fragment {
                     public void run() {
                         // 显示密码修改对话框
                         Intent intent = new Intent(requireContext(), ChangePasswordActivity.class);
+                        startActivity(intent);
+                    }
+                });
+            }
+        });
+        changeThemeImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DebounceUtils.debounce(new Runnable() {
+                    public void run() {
+                        // 显示密码修改对话框
+                        Intent intent = new Intent(requireContext(), ThemeActivity.class);
                         startActivity(intent);
                     }
                 });

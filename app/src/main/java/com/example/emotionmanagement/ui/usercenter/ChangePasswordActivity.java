@@ -3,10 +3,15 @@ package com.example.emotionmanagement.ui.usercenter;
 import static androidx.core.content.ContentProviderCompat.requireContext;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.emotionmanagement.R;
+import com.example.emotionmanagement.util.ThemeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +45,15 @@ public class ChangePasswordActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setBackgroundDrawable(new ColorDrawable(ThemeManager.getInstance(getApplicationContext()).getCurrentThemeColor()));
         setContentView(R.layout.activity_change_password);
+        // 使状态栏透明
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.TRANSPARENT);
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
         SharedPreferences sharedPref = getSharedPreferences("user_info", MODE_PRIVATE);
         userId = sharedPref.getInt("user_id", -1);
         Log.d("CXL", "userId" + String.valueOf(userId));
@@ -115,6 +129,13 @@ public class ChangePasswordActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getWindow().setBackgroundDrawable(new ColorDrawable(ThemeManager.getInstance(getApplicationContext()).getCurrentThemeColor()));
+    }
+
 
     private void loadUserAvatar() {
         SharedPreferences sharedPref = getSharedPreferences("user_info", MODE_PRIVATE);
