@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.emotionmanagement.MyApp;
 import com.example.emotionmanagement.R;
+import com.example.emotionmanagement.ui.login.LoginActivity;
 import com.example.emotionmanagement.ui.usercenter.ChangePasswordActivity;
 import com.example.emotionmanagement.ui.usercenter.PrivacyPolicyActivity;
 import com.example.emotionmanagement.ui.usercenter.ThemeActivity;
@@ -78,10 +80,106 @@ public class PersonalCenterFragment extends Fragment {
         RelativeLayout changeFontSizeLayout = rootView.findViewById(R.id.change_font_style);
         RelativeLayout userAgreementLayout = rootView.findViewById(R.id.user_agreement);
         RelativeLayout privacyPolicyLayout = rootView.findViewById(R.id.privacy_policy);
+        RelativeLayout logoutLayout = rootView.findViewById(R.id.cancel_account);
 
         // 从本地加载用户信息
         loadLocalUserInfo();
         // 设置点击事件监听器
+
+        // 在logoutLayout的点击事件中添加注销账号功能
+        logoutLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 创建密码输入对话框
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                builder.setTitle("确认注销");
+                builder.setMessage("请输入密码以确认注销账号：");
+
+                // 设置密码输入框
+                final EditText inputPassword = new EditText(requireContext());
+                inputPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                builder.setView(inputPassword);
+
+                // 添加确认按钮点击事件
+                builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 获取用户输入的密码
+                        String password = inputPassword.getText().toString().trim();
+
+                        // 向服务器发送注销账号请求
+                        OkHttpClient client = new OkHttpClient();
+
+                        JSONObject jsonBody = new JSONObject();
+                        try {
+                            jsonBody.put("user_id", userId);
+                            jsonBody.put("password_hash", (password));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        RequestBody requestBody = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
+
+                        Request request = new Request.Builder()
+                                .url("http://192.168.68.170:5000/delete_account")
+                                .post(requestBody)
+                                .build();
+
+                        client.newCall(request).enqueue(new Callback() {
+                            @Override
+                            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                                e.printStackTrace();
+                                requireActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(requireContext(), "无法连接到服务器", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                                final String responseData = response.body().string();
+                                requireActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            JSONObject jsonObject = new JSONObject(responseData);
+                                            String message = jsonObject.optString("message", "");
+                                            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+
+                                            // 如果账号注销成功，跳转到登录界面或者执行其他操作
+                                            if ("账号注销成功".equals(message)) {
+                                                // 跳转到登录界面
+                                                Intent intent = new Intent(requireContext(), LoginActivity.class);
+                                                startActivity(intent);
+                                                requireActivity().finish();
+                                            }
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                            Toast.makeText(requireContext(), "服务器返回数据格式错误", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+
+                // 添加取消按钮点击事件
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 取消操作，关闭对话框
+                        dialog.dismiss();
+                    }
+                });
+
+                // 显示对话框
+                builder.show();
+            }
+        });
+
 
         privacyPolicyLayout.setOnClickListener(new View.OnClickListener() {
             @Override
