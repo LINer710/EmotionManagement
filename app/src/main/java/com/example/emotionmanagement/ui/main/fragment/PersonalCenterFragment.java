@@ -57,6 +57,7 @@ public class PersonalCenterFragment extends Fragment {
     private TextView nicknameTextView;
     private int userId;
     private String currentNickname;
+    private ImageView logoutButton;
 
     public PersonalCenterFragment() {
     }
@@ -74,6 +75,7 @@ public class PersonalCenterFragment extends Fragment {
         profileImageView = rootView.findViewById(R.id.profile_image);
         // 初始化昵称 TextView
         nicknameTextView = rootView.findViewById(R.id.nickname);
+        logoutButton = rootView.findViewById(R.id.logout_button);
 
         RelativeLayout changePasswordLayout = rootView.findViewById(R.id.change_password);
         RelativeLayout changeThemeLayout = rootView.findViewById(R.id.change_theme);
@@ -147,6 +149,10 @@ public class PersonalCenterFragment extends Fragment {
                                             JSONObject jsonObject = new JSONObject(responseData);
                                             String message = jsonObject.optString("message", "");
                                             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                                            // 在注销账号成功后清除本地持久化数据
+                                            SharedPreferences.Editor editor = requireActivity().getSharedPreferences("user_info", requireContext().MODE_PRIVATE).edit();
+                                            editor.clear();
+                                            editor.apply();
 
                                             // 如果账号注销成功，跳转到登录界面或者执行其他操作
                                             if ("账号注销成功".equals(message)) {
@@ -284,6 +290,36 @@ public class PersonalCenterFragment extends Fragment {
                 });
             }
         });
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                builder.setTitle("确认退出");
+                builder.setMessage("确定要退出登录吗？");
+
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        // 跳转到登录界面
+                        Intent intent = new Intent(requireContext(), LoginActivity.class);
+                        startActivity(intent);
+                        requireActivity().finish();
+                    }
+                });
+
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+
+
 
         return rootView;
     }
