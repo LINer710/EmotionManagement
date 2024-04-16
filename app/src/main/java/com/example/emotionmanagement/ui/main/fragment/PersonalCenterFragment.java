@@ -1,6 +1,5 @@
 package com.example.emotionmanagement.ui.main.fragment;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,10 +10,12 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.emotionmanagement.MyApp;
 import com.example.emotionmanagement.R;
 import com.example.emotionmanagement.ui.usercenter.ChangePasswordActivity;
 import com.example.emotionmanagement.ui.usercenter.ThemeActivity;
@@ -34,11 +36,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -71,11 +71,50 @@ public class PersonalCenterFragment extends Fragment {
         // 初始化昵称 TextView
         nicknameTextView = rootView.findViewById(R.id.nickname);
 
-        RelativeLayout changePasswordImageView = rootView.findViewById(R.id.change_password);
-        RelativeLayout changeThemeImageView = rootView.findViewById(R.id.change_theme);
+        RelativeLayout changePasswordLayout = rootView.findViewById(R.id.change_password);
+        RelativeLayout changeThemeLayout = rootView.findViewById(R.id.change_theme);
+        RelativeLayout changeFontSizeLayout = rootView.findViewById(R.id.change_font_style);
 
         // 从本地加载用户信息
         loadLocalUserInfo();
+        // 设置点击事件监听器
+        changeFontSizeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 创建PopupMenu对象
+                PopupMenu popupMenu = new PopupMenu(requireContext(), v);
+
+                // 加载菜单项布局
+                popupMenu.getMenuInflater().inflate(R.menu.font_size_menu, popupMenu.getMenu());
+
+                // 设置菜单项点击事件监听器
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        MyApp myApp = (MyApp) getActivity().getApplication();
+                        int itemId = item.getItemId();
+                        if (itemId == R.id.kaiti_font) {
+                            MyApp.setCustomFont("fonts/kaiti.ttf");
+                        } else if (itemId == R.id.shouxieti_font) {
+                            MyApp.setCustomFont("fonts/shouxieti.ttf");
+                        } else if (itemId == R.id.shufati_font) {
+                            MyApp.setCustomFont("fonts/shufati.ttf");
+                        } else if (itemId == R.id.songti_font) {
+                            MyApp.setCustomFont("fonts/songti.ttf");
+                        } else if (itemId == R.id.xingti_font) {
+                            MyApp.setCustomFont("fonts/xingti.otf");
+                        } else if (itemId == R.id.yaunti_font) {
+                            MyApp.setCustomFont("fonts/yuanti.ttf");
+                        }
+                        updateAllFonts();
+                        return true;
+                    }
+                });
+
+                // 显示PopupMenu
+                popupMenu.show();
+            }
+        });
 
         // 设置昵称点击事件
         nicknameTextView.setOnClickListener(new View.OnClickListener() {
@@ -103,7 +142,7 @@ public class PersonalCenterFragment extends Fragment {
             }
         });
 
-        changePasswordImageView.setOnClickListener(new View.OnClickListener() {
+        changePasswordLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DebounceUtils.debounce(new Runnable() {
@@ -115,7 +154,7 @@ public class PersonalCenterFragment extends Fragment {
                 });
             }
         });
-        changeThemeImageView.setOnClickListener(new View.OnClickListener() {
+        changeThemeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DebounceUtils.debounce(new Runnable() {
@@ -130,6 +169,23 @@ public class PersonalCenterFragment extends Fragment {
 
         return rootView;
     }
+
+    private void updateAllFonts() {
+        ViewGroup rootView = (ViewGroup) getActivity().getWindow().getDecorView().getRootView();
+        updateFontsRecursively(rootView);
+    }
+
+    private void updateFontsRecursively(ViewGroup rootView) {
+        for (int i = 0; i < rootView.getChildCount(); i++) {
+            View child = rootView.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                updateFontsRecursively((ViewGroup) child);
+            } else if (child instanceof TextView) {
+                ((TextView) child).setTypeface(MyApp.getCustomFont());
+            }
+        }
+    }
+
 
     /**
      * 从本地加载用户信息

@@ -15,7 +15,7 @@
         android:layout_marginBottom="32dp"
         android:src="@drawable/img_logo" />
 
-    <TextView
+    <com.example.emotionmanagement.util.CustomTextView
         android:id="@+id/textViewDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
             android:layout_height="20dp"
             android:src="@drawable/ic_username" />
 
-        <EditText
+        <com.example.emotionmanagement.util.CustomEditText
             android:id="@+id/editTextUsername"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
             android:src="@drawable/ic_password" />
 
 
-        <EditText
+        <com.example.emotionmanagement.util.CustomEditText
             android:id="@+id/editTextPassword"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
 
     </LinearLayout>
 
-    <android.widget.Button
+    <com.example.emotionmanagement.util.CustomButton
         android:id="@+id/buttonLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -104,7 +104,7 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
-    <TextView
+    <com.example.emotionmanagement.util.CustomTextView
         android:id="@+id/textViewRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

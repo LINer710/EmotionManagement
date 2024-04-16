@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/kaiti_font"
+        android:title="楷体" />
+
+    <item
+        android:id="@+id/shouxieti_font"
+        android:title="手写体" />
+    <item
+        android:id="@+id/shufati_font"
+        android:title="书法体" />
+    <item
+        android:id="@+id/songti_font"
+        android:title="宋体" />
+
+    <item
+        android:id="@+id/xingti_font"
+        android:title="行体" />
+    <item
+        android:id="@+id/yaunti_font"
+        android:title="圆体" />
+</menu>

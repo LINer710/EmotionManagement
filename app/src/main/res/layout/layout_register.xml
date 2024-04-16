@@ -14,7 +14,7 @@
         android:layout_marginBottom="32dp"
         android:src="@drawable/img_logo" />
 
-    <TextView
+    <com.example.emotionmanagement.util.CustomTextView
         android:id="@+id/textViewDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
         android:textSize="20sp"
         android:textStyle="italic" />
 
-    <EditText
+    <com.example.emotionmanagement.util.CustomEditText
         android:id="@+id/editTextUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
         android:textColorHint="#807E7E" />
 
     <!-- 密码输入框 -->
-    <EditText
+    <com.example.emotionmanagement.util.CustomEditText
         android:id="@+id/editTextPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
         android:textColorHint="#807E7E" />
 
     <!-- 确认密码输入框 -->
-    <EditText
+    <com.example.emotionmanagement.util.CustomEditText
         android:id="@+id/editTextConfirmPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
         android:textColorHint="#807E7E" />
 
     <!-- 注册按钮 -->
-    <android.widget.Button
+    <com.example.emotionmanagement.util.CustomButton
         android:id="@+id/buttonRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
