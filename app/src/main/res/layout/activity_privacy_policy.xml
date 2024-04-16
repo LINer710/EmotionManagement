@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="40dp"
+    android:paddingHorizontal="16dp">
+
+    <com.example.emotionmanagement.util.CustomTextView
+        android:id="@+id/textTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="隐私政策"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.example.emotionmanagement.util.CustomTextView
+            android:id="@+id/textPrivacyPolicyContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/privacy_policy_content"
+            android:textSize="16sp"
+            android:lineSpacingExtra="4dp"
+            android:textColor="@android:color/black"
+            android:textColorLink="#807E7E"/>
+
+    </ScrollView>
+
+    <com.example.emotionmanagement.util.CustomButton
+        android:id="@+id/btnAgreePrivacyPolicy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="同     意"
+        android:textSize="18sp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/button_rounded_bg"
+        android:textColor="@android:color/white"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"/>
+
+</LinearLayout>

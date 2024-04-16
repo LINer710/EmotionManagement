@@ -28,7 +28,9 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.emotionmanagement.MyApp;
 import com.example.emotionmanagement.R;
 import com.example.emotionmanagement.ui.usercenter.ChangePasswordActivity;
+import com.example.emotionmanagement.ui.usercenter.PrivacyPolicyActivity;
 import com.example.emotionmanagement.ui.usercenter.ThemeActivity;
+import com.example.emotionmanagement.ui.usercenter.UserAgreementActivity;
 import com.example.emotionmanagement.util.DebounceUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -74,10 +76,28 @@ public class PersonalCenterFragment extends Fragment {
         RelativeLayout changePasswordLayout = rootView.findViewById(R.id.change_password);
         RelativeLayout changeThemeLayout = rootView.findViewById(R.id.change_theme);
         RelativeLayout changeFontSizeLayout = rootView.findViewById(R.id.change_font_style);
+        RelativeLayout userAgreementLayout = rootView.findViewById(R.id.user_agreement);
+        RelativeLayout privacyPolicyLayout = rootView.findViewById(R.id.privacy_policy);
 
         // 从本地加载用户信息
         loadLocalUserInfo();
         // 设置点击事件监听器
+
+        privacyPolicyLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), PrivacyPolicyActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        userAgreementLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), UserAgreementActivity.class);
+                startActivity(intent);
+            }
+        });
         changeFontSizeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

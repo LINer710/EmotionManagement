@@ -1,7 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.emotionmanagement">
-
     <!-- 权限声明 -->
     <uses-permission
         android:name="android.permission.INTERNET"
@@ -10,7 +10,6 @@
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 
-    <!-- Application 配置 -->
     <application
         android:name=".MyApp"
         android:allowBackup="true"
@@ -23,8 +22,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EmotionManagement"
         tools:targetApi="31">
-
-        <!-- Activity 配置 -->
+        <activity
+            android:name=".ui.usercenter.PrivacyPolicyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.usercenter.UserAgreementActivity"
+            android:exported="false" /> <!-- Activity 配置 -->
         <activity
             android:name=".ui.usercenter.ThemeActivity"
             android:exported="false" />
@@ -43,8 +46,10 @@
             android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
+
 </manifest>
