@@ -1,14 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.main.fragment.EmotionManageFragment">
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- 轮播图部分 -->
+    <ImageView
+        android:id="@+id/image_slider"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="200dp"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="60dp"
+        android:paddingBottom="16dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/test" />
 
-</FrameLayout>
+    <!-- 横向菜单栏 -->
+    <HorizontalScrollView
+        android:id="@+id/horizontal_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/image_slider"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/half_rounded_white_background">
+
+        <LinearLayout
+            android:id="@+id/menu_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+
+    </HorizontalScrollView>
+
+    <!-- 分类下的情绪管理文章 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/article_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/horizontal_scroll_view"
+        android:layout_marginHorizontal="16dp"
+        android:background="@drawable/bottom_half_rounded_white_background" />
+
+</RelativeLayout>

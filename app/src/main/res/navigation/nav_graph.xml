@@ -12,7 +12,7 @@
 
     <fragment
         android:id="@+id/navigation_emotionManage"
-        android:name="com.example.emotionmanagement.ui.main.fragment.EmotionManageFragment"
+        android:name="com.example.emotionmanagement.ui.main.emotionmanage.EmotionManageFragment"
         android:label="EmotionManage"
         tools:layout="@layout/fragment_emotion_manage" />
 
