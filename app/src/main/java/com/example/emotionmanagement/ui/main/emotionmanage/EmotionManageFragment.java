@@ -1,5 +1,6 @@
 package com.example.emotionmanagement.ui.main.emotionmanage;
 
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ public class EmotionManageFragment extends Fragment {
     private boolean isLastPage = false;
     private int totalPage = 3; // 假设总共有5页，这个值应由服务器提供
     private String currentCategory; // 当前文章分类
+    private int userId;
 
 
     @Override
@@ -47,10 +49,13 @@ public class EmotionManageFragment extends Fragment {
 
         // 获取菜单栏的 LinearLayout
         LinearLayout menuContainer = rootView.findViewById(R.id.menu_container);
+        SharedPreferences sharedPref = requireActivity().getSharedPreferences("user_info", requireContext().MODE_PRIVATE);
+        userId = sharedPref.getInt("user_id", -1);
 
         // 菜单项文本数组
-        String[] menuItems = {"精选", "亲子关系", "亲密关系", "人际关系", "咨询小科普"
-                , "家庭关系", "情绪压力", "个人成长"};
+        String[] menuItems = {"精选", "亲子关系", "亲密关系", "人际关系", "咨询小科普",
+                "家庭关系", "情绪压力", "个人成长", "我的收藏"};
+
 
         // 动态添加菜单项
         for (String menuItem : menuItems) {
@@ -138,8 +143,12 @@ public class EmotionManageFragment extends Fragment {
         // 清空现有数据
         adapter.clearArticles();
 
-        // 重新加载数据
-        new LoadArticlesTask().execute(category);
+        // 根据类别重新加载数据，特别处理"我的收藏"
+        if (category.equals("我的收藏")) {
+            new LoadFavoritesTask().execute(); // 加载收藏的文章
+        } else {
+            new LoadArticlesTask().execute(category); // 加载其他分类的文章
+        }
     }
 
 
@@ -151,7 +160,7 @@ public class EmotionManageFragment extends Fragment {
             String category = params[0];
             // 构建请求 URL
             String baseUrl = "http://192.168.68.170:5000";
-            String url = baseUrl + "/articles?category=" + category;
+            String url = baseUrl + "/articles?category=" + category + "&user_id=" + userId + "&page=" + currentPage;
 
 
             // 发起网络请求获取文章数据
@@ -166,6 +175,7 @@ public class EmotionManageFragment extends Fragment {
                     String responseData = response.body().string();
                     JSONObject jsonObject = new JSONObject(responseData);
                     JSONArray jsonArray = jsonObject.getJSONArray("articles");
+                    totalPage = jsonObject.getInt("total_pages");
                     List<Article> articles = new ArrayList<>();
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONArray item = jsonArray.getJSONArray(i);
@@ -203,6 +213,65 @@ public class EmotionManageFragment extends Fragment {
             }
             isLoading = false;
         }
+    }
+
+    private class LoadFavoritesTask extends AsyncTask<Void, Void, List<Article>> {
+        @Override
+        protected List<Article> doInBackground(Void... voids) {
+            String baseUrl = "http://192.168.68.170:5000";
+            String url = baseUrl + "/get_favorites?user_id=" + userId;
+            Log.d("CXL", "收藏请求：" + url);
+
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+
+            try {
+                Response response = client.newCall(request).execute();
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    JSONObject jsonObject = new JSONObject(responseData);
+                    JSONArray jsonArray = jsonObject.getJSONArray("favorites");
+                    Log.d("CXL", "收藏请求成功：" + jsonArray);
+                    List<Article> articles = new ArrayList<>();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject item = jsonArray.getJSONObject(i);
+                        Article article = parseArticle(item);
+                        articles.add(article);
+                    }
+                    return articles;
+                }
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+                Log.d("CXL", "收藏请求失败：" + e.getMessage());
+            }
+            return new ArrayList<>(); // 返回空列表表示加载失败
+        }
+
+
+        @Override
+        protected void onPostExecute(List<Article> articles) {
+            super.onPostExecute(articles);
+            if (articles != null && !articles.isEmpty()) {
+                adapter.addArticles(articles);
+                adapter.notifyDataSetChanged();
+            }
+            isLoading = false;
+        }
+    }
+
+    private Article parseArticle(JSONObject item) throws JSONException {
+        int resourceId = item.getInt("resource_id");
+        String title = item.getString("title");
+        String content = item.getString("content");
+        String category = item.getString("category");
+        int views = item.getInt("views");
+        int favorites = item.getInt("favorites");
+        String imageUrl = item.getString("image_url");
+        String url = item.getString("article_link");
+
+        return new Article(resourceId, title, category, content, views, favorites, imageUrl, url);
     }
 
 }

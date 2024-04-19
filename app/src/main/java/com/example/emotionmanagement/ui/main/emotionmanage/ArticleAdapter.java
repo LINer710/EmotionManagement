@@ -4,11 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.emotionmanagement.R;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,6 +36,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
     private List<Article> articles;
     private Context context;
+    private int userId;
+
 
     public ArticleAdapter(List<Article> articles, Context context) {
         this.articles = articles;
@@ -70,6 +73,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Article article = articles.get(position);
+        SharedPreferences sharedPref = context.getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        userId = sharedPref.getInt("user_id", -1);
         holder.textTitle.setText(article.getTitle());
         holder.textContent.setText(article.getShortenedContent()); // 使用截取后的内容
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -83,8 +88,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
         });
 
         holder.textViews.setText(String.valueOf(article.getViews()));
-        holder.imageFavorite.setImageResource(article.isFavorite() ? R.drawable.ic_favorite_outline : R.drawable.ic_no_favorite_outline);
-
+        holder.imageFavorite.setImageResource(article.isFavorite() ? R.drawable.ic_is_favorite_outline : R.drawable.ic_not_favorite_outline);
+        holder.imageFavorite.setOnClickListener(v -> {
+            toggleFavorite(article, position, holder);
+        });
         // 使用 Glide 加载图片
         if (article.getImageUrl() != null && !article.getImageUrl().isEmpty()) {
             String imageUrl = article.getImageUrl();
@@ -95,6 +102,55 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
                     .load(imageUrl)
                     .into(holder.imageArticle);
         }
+    }
+
+    private void toggleFavorite(Article article, int position, ViewHolder holder) {
+        OkHttpClient client = new OkHttpClient();
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("user_id", userId);
+            jsonBody.put("resource_id", article.getResourceId());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        RequestBody requestBody = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
+        Request request = new Request.Builder()
+                .url("http://192.168.68.170:5000/toggle_favorite")
+                .post(requestBody)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful() && response.body() != null) {
+                    String responseData = response.body().string();
+                    try {
+                        JSONObject jsonResponse = new JSONObject(responseData);
+                        String message = jsonResponse.optString("message");
+                        if (message.equals("点赞成功") || message.equals("取消点赞成功")) {
+                            article.toggleFavorite();  // 更新点赞状态
+                            if (context instanceof Activity) {
+                                ((Activity) context).runOnUiThread(() -> {
+                                    holder.imageFavorite.setImageResource(article.isFavorite() ? R.drawable.ic_is_favorite_outline : R.drawable.ic_not_favorite_outline);
+                                    notifyItemChanged(position);
+                                });
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.printStackTrace();
+                if (context instanceof Activity) {
+                    ((Activity) context).runOnUiThread(() -> Toast.makeText(context, "网络请求失败", Toast.LENGTH_SHORT).show());
+                }
+            }
+        });
     }
 
     private void incrementViews(int resourceId, int position, ViewHolder holder) {

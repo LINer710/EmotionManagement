@@ -95,6 +95,16 @@ public class Article {
         return favorites > 0; // 如果 favorites 大于 0，则表示被收藏
     }
 
+    // 修改点赞状态
+    public void toggleFavorite() {
+        if (isFavorite()) {
+            favorites--;  // 如果已经被点赞，取消点赞
+        } else {
+            favorites++;  // 否则增加点赞数
+        }
+    }
+
+
     public String getShortenedContent() {
         if (content.length() <= 30) {
             return content;
