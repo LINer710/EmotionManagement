@@ -13,6 +13,7 @@ public class MyApp extends Application {
     private static Typeface customFont;
     private static SharedPreferences preferences;
     private static Context context; // Store context here
+    public static String URL = "http://172.20.10.3:5000";
 
     @Override
     public void onCreate() {

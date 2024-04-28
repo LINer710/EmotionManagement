@@ -1,5 +1,7 @@
 package com.example.emotionmanagement.ui.main.emotionmanage;
 
+import static com.example.emotionmanagement.MyApp.URL;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -116,7 +118,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
         RequestBody requestBody = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
         Request request = new Request.Builder()
-                .url("http://192.168.68.170:5000/toggle_favorite")
+                .url(URL +"/toggle_favorite")
                 .post(requestBody)
                 .build();
 
@@ -164,7 +166,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
         RequestBody requestBody = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
         Request request = new Request.Builder()
-                .url("http://192.168.68.170:5000/increment_views")
+                .url(URL +"/increment_views")
                 .post(requestBody)
                 .build();
 

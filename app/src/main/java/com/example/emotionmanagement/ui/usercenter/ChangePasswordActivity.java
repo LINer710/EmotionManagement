@@ -1,6 +1,6 @@
 package com.example.emotionmanagement.ui.usercenter;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
+import static com.example.emotionmanagement.MyApp.URL;
 
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -84,7 +84,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                             RequestBody body = RequestBody.create(mediaType, requestBody);
 
                             Request request = new Request.Builder()
-                                    .url("http://192.168.68.170:5000/update_password")
+                                    .url(URL +"/update_password")
                                     .post(body)
                                     .build();
 

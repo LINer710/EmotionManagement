@@ -1,5 +1,7 @@
 package com.example.emotionmanagement.ui.main.emotionmanage;
 
+import static com.example.emotionmanagement.MyApp.URL;
+
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -157,7 +159,7 @@ public class EmotionManageFragment extends Fragment {
         protected List<Article> doInBackground(String... params) {
             String category = params[0];
             // 构建请求 URL
-            String baseUrl = "http://192.168.68.170:5000";
+            String baseUrl = URL;
             String url = baseUrl + "/articles?category=" + category + "&user_id=" + userId + "&page=" + currentPage;
 
 
@@ -216,7 +218,7 @@ public class EmotionManageFragment extends Fragment {
     private class LoadFavoritesTask extends AsyncTask<Void, Void, List<Article>> {
         @Override
         protected List<Article> doInBackground(Void... voids) {
-            String baseUrl = "http://192.168.68.170:5000";
+            String baseUrl =URL;
             String url = baseUrl + "/get_favorites?user_id=" + userId;
             Log.d("CXL", "收藏请求：" + url);
 

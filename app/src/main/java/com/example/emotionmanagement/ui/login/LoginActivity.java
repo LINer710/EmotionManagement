@@ -1,5 +1,7 @@
 package com.example.emotionmanagement.ui.login;
 
+import static com.example.emotionmanagement.MyApp.URL;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -161,7 +163,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // 构建 POST 请求
         Request request = new Request.Builder()
-                .url("http://192.168.68.170:5000/login")
+                .url(URL +"/login")
                 .post(requestBody)
                 .build();
 
@@ -280,7 +282,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // 构建 GET 请求
         Request request = new Request.Builder()
-                .url("http://192.168.68.170:5000/get_user_id?username=" + username)
+                .url(URL +"/get_user_id?username=" + username)
                 .build();
 
         // 打印请求信息

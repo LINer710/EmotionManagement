@@ -1,6 +1,11 @@
 package com.example.emotionmanagement.ui.main.diary;
 
+import static com.example.emotionmanagement.MyApp.URL;
+import static com.example.emotionmanagement.ui.main.diary.ChatAdapter.KEY_SERVER_MESSAGES;
+import static com.example.emotionmanagement.ui.main.diary.ChatAdapter.KEY_USER_MESSAGES;
+
 import android.Manifest;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -29,6 +34,10 @@ import okio.BufferedSource;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class DiaryFragment extends Fragment {
     private EditText editMessage;
@@ -38,6 +47,10 @@ public class DiaryFragment extends Fragment {
     private ChatAdapter chatAdapter;  // 假设您已经创建了这个适配器类
     private StringBuilder messageBuilder = new StringBuilder();
     private int userId;
+    // SharedPreferences 文件名
+    private static final String SHARED_PREF_NAME = "diary_messages";
+    // SharedPreferences 存储对话内容的键名
+    private static final String KEY_MESSAGES = "messages";
 
 
     @Override
@@ -59,13 +72,87 @@ public class DiaryFragment extends Fragment {
         Log.d("CXL", String.valueOf(userId));
         fetchUserDetails(userId);
 
+        loadMessagesFromSharedPreferences();
+
+
         return view;
     }
+
+
+
+    public void loadMessagesFromSharedPreferences() {
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+
+        // 创建用于存储用户消息和服务器消息的临时列表
+        List<String> userMessages = new ArrayList<>();
+        List<String> serverMessages = new ArrayList<>();
+
+        // 从SharedPreferences中加载用户消息
+        String userMessagesJson = sharedPreferences.getString(KEY_USER_MESSAGES, null);
+        if (userMessagesJson != null) {
+            try {
+                JSONArray userMessagesArray = new JSONArray(userMessagesJson);
+                for (int i = 0; i < userMessagesArray.length(); i++) {
+                    String userMessage = userMessagesArray.getString(i);
+                    userMessages.add(userMessage);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 从SharedPreferences中加载服务器消息
+        String serverMessagesJson = sharedPreferences.getString(KEY_SERVER_MESSAGES, null);
+        if (serverMessagesJson != null) {
+            try {
+                JSONArray serverMessagesArray = new JSONArray(serverMessagesJson);
+                for (int i = 0; i < serverMessagesArray.length(); i++) {
+                    String serverMessage = serverMessagesArray.getString(i);
+                    serverMessages.add(serverMessage);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 将用户消息和服务器消息按照对话顺序合并到适配器的消息列表中
+        int userIndex = 0;
+        int serverIndex = 0;
+        while (userIndex < userMessages.size() || serverIndex < serverMessages.size()) {
+            if (userIndex < userMessages.size()) {
+                chatAdapter.addMessage(userMessages.get(userIndex), ChatAdapter.getViewTypeUser());
+                userIndex++;
+            }
+            if (serverIndex < serverMessages.size()) {
+                chatAdapter.addMessage(serverMessages.get(serverIndex), ChatAdapter.getViewTypeServer());
+                serverIndex++;
+            }
+        }
+    }
+
+
+
+
+    public void saveMessagesToSharedPreferences() {
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // 保存用户消息列表
+        JSONArray userMessagesArray = new JSONArray(chatAdapter.getUserMessages());
+        editor.putString(KEY_USER_MESSAGES, userMessagesArray.toString());
+
+        // 保存服务器消息列表
+        JSONArray serverMessagesArray = new JSONArray(chatAdapter.getServerMessages());
+        editor.putString(KEY_SERVER_MESSAGES, serverMessagesArray.toString());
+
+        editor.apply();
+    }
+
 
     private void sendMessage() {
         String message = editMessage.getText().toString().trim();
         if (!message.isEmpty()) {
-            chatAdapter.addMessage(message);  // 添加用户消息到聊天界面
+            chatAdapter.addMessage(message, ChatAdapter.getViewTypeUser());  // 添加用户消息到聊天界面
             postRequest(message);
             editMessage.setText("");
         }
@@ -97,10 +184,12 @@ public class DiaryFragment extends Fragment {
         RequestBody body = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
         Request request = new Request.Builder()
 //                .url("https://api.fastgpt.in/api/v1/chat/completions")
-                .url("https://xiaofei.zeabur.app/v1/chat/completions")
+//                .url("https://xiaofei.zeabur.app/v1/chat/completions")
+                .url("https://testone.caifree.com/v1/chat/completions")
+
                 .post(body)
 //                .addHeader("Authorization", "Bearer fastgpt-iUqCFhGNo5EcXGZHByl3YkEmbrFyPGpECid6vWJu1boY4zef7fttqPUDNBEUdZOx")  // Replace with your token
-                .addHeader("Authorization", "Bearer sk-zQOYt7UCrvSjzx6G094bFeC7111b4cF1A75c88E855714d5e")  // Replace with your token
+                .addHeader("Authorization", "Bearer sk-bBuL5QvlgkiZJxMR42C1C1Af515143E5852b4774032f4455")  // Replace with your token
                 .addHeader("Content-Type", "application/json")
                 .build();
 
@@ -109,7 +198,7 @@ public class DiaryFragment extends Fragment {
             @Override
             public void onFailure(Call call, IOException e) {
                 getActivity().runOnUiThread(() ->
-                        chatAdapter.addMessage("Error: " + e.getMessage()));
+                        chatAdapter.addMessage("Error: " + e.getMessage(), ChatAdapter.getViewTypeServer()));
             }
 
             @Override
@@ -170,7 +259,7 @@ public class DiaryFragment extends Fragment {
     }
 
     private void fetchAvatar(int userId) {
-        String url = "http://192.168.68.170:5000/get_avatar/" + userId;
+        String url = URL + "/get_avatar/" + userId;
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -184,24 +273,24 @@ public class DiaryFragment extends Fragment {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                    String responseData = response.body().string();
-                    try {
-                        JSONObject jsonObject = new JSONObject(responseData);
-                        Log.d("CXL", "Avatar URL: " + jsonObject.optString("avatar"));
-                        final String avatarUrl = jsonObject.optString("avatar", null);
-                        getActivity().runOnUiThread(() -> {
-                            // Update UI with avatar URL
-                            chatAdapter.setUserAvatar(avatarUrl);
-                        });
-                    } catch (JSONException e) {
-                        Log.e("FetchAvatar", "JSON parsing error", e);
-                    }
+                String responseData = response.body().string();
+                try {
+                    JSONObject jsonObject = new JSONObject(responseData);
+                    Log.d("CXL", "Avatar URL: " + jsonObject.optString("avatar"));
+                    final String avatarUrl = jsonObject.optString("avatar", null);
+                    getActivity().runOnUiThread(() -> {
+                        // Update UI with avatar URL
+                        chatAdapter.setUserAvatar(avatarUrl);
+                    });
+                } catch (JSONException e) {
+                    Log.e("FetchAvatar", "JSON parsing error", e);
                 }
+            }
         });
     }
 
     private void fetchNickname(int userId) {
-        String url = "http://192.168.68.170:5000/get_nickname/" + userId;
+        String url = URL + "/get_nickname/" + userId;
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -233,4 +322,10 @@ public class DiaryFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        // 在Fragment停止时保存对话内容到SharedPreferences中
+        saveMessagesToSharedPreferences();
+    }
 }

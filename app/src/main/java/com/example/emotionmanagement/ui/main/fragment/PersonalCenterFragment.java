@@ -1,5 +1,7 @@
 package com.example.emotionmanagement.ui.main.fragment;
 
+import static com.example.emotionmanagement.MyApp.URL;
+
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
@@ -130,7 +132,7 @@ public class PersonalCenterFragment extends Fragment {
                         RequestBody requestBody = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
 
                         Request request = new Request.Builder()
-                                .url("http://192.168.68.170:5000/delete_account")
+                                .url(URL +"/delete_account")
                                 .post(requestBody)
                                 .build();
 
@@ -440,7 +442,7 @@ public class PersonalCenterFragment extends Fragment {
         RequestBody requestBody = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
 
         Request request = new Request.Builder()
-                .url("http://192.168.68.170:5000/update_nickname")
+                .url(URL+"/update_nickname")
                 .post(requestBody)
                 .build();
 
@@ -491,7 +493,7 @@ public class PersonalCenterFragment extends Fragment {
      */
     private void loadUserAvatar() {
         if (userId != -1) {
-            String avatarUrl = "http://192.168.68.170:5000/get_avatar/" + userId;
+            String avatarUrl = URL+"/get_avatar/" + userId;
             OkHttpClient client = new OkHttpClient();
 
             // 构建 GET 请求
@@ -638,7 +640,7 @@ public class PersonalCenterFragment extends Fragment {
         RequestBody requestBody = RequestBody.create(jsonBody.toString(), JSON);
 
         Request request = new Request.Builder()
-                .url("http://192.168.68.170:5000/update_avatar")
+                .url(URL+"/update_avatar")
                 .post(requestBody)
                 .build();
 

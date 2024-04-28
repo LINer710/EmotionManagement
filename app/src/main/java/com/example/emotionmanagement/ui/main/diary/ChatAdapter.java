@@ -45,14 +45,30 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private String lastServerMessage = "";
     private String userAvatarUrl = "content://media/external_primary/images/media/1000002699"; // 默认头像 URL
     private String userNickname = "用户"; // 默认昵称
+    public static final String KEY_USER_MESSAGES = "user_messages";
+    public static final String KEY_SERVER_MESSAGES = "server_messages";
 
     public ChatAdapter() {
         this.messages = new ArrayList<>();
     }
 
-    public void addMessage(String message) {
-        Log.d("CXL", "addMessage: " + message);
-        messages.add("User: " + message);
+    public static int getViewTypeUser() {
+        return VIEW_TYPE_USER;
+    }
+
+    public static int getViewTypeServer() {
+        return VIEW_TYPE_SERVER;
+    }
+
+
+    public void addMessage(String message, int viewType) {
+        if (viewType == VIEW_TYPE_USER) {
+            messages.add("User: " + message);
+        } else if (viewType == VIEW_TYPE_SERVER) {
+//
+            messages.add("Server: " + message);
+
+        }
         notifyItemInserted(messages.size() - 1);
     }
 
@@ -69,6 +85,29 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             lastServerMessageIndex = messages.size() - 1;
             notifyItemInserted(lastServerMessageIndex);
         }
+    }
+
+
+
+
+    public List<String> getUserMessages() {
+        List<String> userMessages = new ArrayList<>();
+        for (String message : messages) {
+            if (message.startsWith("User:")) {
+                userMessages.add(message.substring(6));
+            }
+        }
+        return userMessages;
+    }
+
+    public List<String> getServerMessages() {
+        List<String> serverMessages = new ArrayList<>();
+        for (String message : messages) {
+            if (message.startsWith("Server:")) {
+                serverMessages.add(message.substring(8));
+            }
+        }
+        return serverMessages;
     }
 
     private void updateMessage(String message) {

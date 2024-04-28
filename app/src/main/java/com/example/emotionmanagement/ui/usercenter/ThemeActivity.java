@@ -1,5 +1,7 @@
 package com.example.emotionmanagement.ui.usercenter;
 
+import static com.example.emotionmanagement.MyApp.URL;
+
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -17,7 +19,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.emotionmanagement.R;
-import com.example.emotionmanagement.ui.login.RegisterActivity;
 import com.example.emotionmanagement.util.ThemeManager;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,11 +26,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -154,7 +153,7 @@ public class ThemeActivity extends AppCompatActivity {
         RequestBody requestBody = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
 
         Request request = new Request.Builder()
-                .url("http://192.168.68.170:5000/upload_theme_color")
+                .url(URL +"/upload_theme_color")
                 .post(requestBody)
                 .build();
 
