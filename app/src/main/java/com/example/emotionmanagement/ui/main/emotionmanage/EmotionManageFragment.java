@@ -150,8 +150,6 @@ public class EmotionManageFragment extends Fragment {
             new LoadArticlesTask().execute(category); // 加载其他分类的文章
         }
     }
-
-
     // 异步任务，用于加载指定分类下的文章数据
     private class LoadArticlesTask extends AsyncTask<String, Void, List<Article>> {
 

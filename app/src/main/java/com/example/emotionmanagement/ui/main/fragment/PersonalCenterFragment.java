@@ -1,14 +1,18 @@
 package com.example.emotionmanagement.ui.main.fragment;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -25,6 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.emotionmanagement.MyApp;
 import com.example.emotionmanagement.R;
@@ -39,7 +44,9 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -320,7 +327,6 @@ public class PersonalCenterFragment extends Fragment {
         });
 
 
-
         return rootView;
     }
 
@@ -366,6 +372,7 @@ public class PersonalCenterFragment extends Fragment {
                 Glide.with(requireContext())
                         .load(avatarUrl)
                         .apply(RequestOptions.circleCropTransform())
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .into(profileImageView);
             } else {
                 // 否则显示默认头像
@@ -524,6 +531,7 @@ public class PersonalCenterFragment extends Fragment {
                          /*       Log.d("CXL", "结果" + jsonObject);
                                 Log.d("CXL", "头像" + avatarUrl);
                                 Log.d("CXL", "isEmpty" + avatarUrl.isEmpty());*/
+                                Log.d("CXL", avatarUrl);
 
                                 if (avatarUrl == null || avatarUrl.isEmpty() || "null".equals(avatarUrl)) {
                                 /*    Log.d("CXL", "头像为空或为null");
@@ -535,6 +543,7 @@ public class PersonalCenterFragment extends Fragment {
                                     Glide.with(requireContext())
                                             .load(avatarUrl)
                                             .apply(RequestOptions.circleCropTransform())
+                                            .diskCacheStrategy(DiskCacheStrategy.NONE)
                                             .into(profileImageView);
                                     // 本地存储
                                     SharedPreferences.Editor editor = requireActivity().getSharedPreferences("user_info", requireContext().MODE_PRIVATE).edit();
@@ -565,18 +574,37 @@ public class PersonalCenterFragment extends Fragment {
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
+    private String encodeImageToBase64(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream); // 使用 JPEG 格式压缩，100表示不压缩
+        byte[] imageBytes = outputStream.toByteArray();
+        return Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+    }
+
+    private Bitmap getBitmapFromUri(Uri uri) throws IOException {
+        ContentResolver contentResolver = getActivity().getContentResolver();
+        InputStream inputStream = contentResolver.openInputStream(uri);
+        return BitmapFactory.decodeStream(inputStream);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null) {
             Uri selectedImage = data.getData();
-            // 使用 Glide 加载图片，并裁剪为圆形
-            Glide.with(this)
-                    .load(selectedImage)
-                    .apply(new RequestOptions().circleCrop())
-                    .into(profileImageView);
-            // 将新头像URL上传到服务器
-            updateAvatar(selectedImage.toString());
+            try {
+
+                Bitmap bitmap = getBitmapFromUri(selectedImage);
+                String imageBase64 = "data:image/jpg;base64," +encodeImageToBase64(bitmap);
+                Glide.with(this)
+                        .load(imageBase64)
+                        .apply(new RequestOptions().circleCrop())
+                        .into(profileImageView);
+                // 将新头像URL上传到服务器
+                updateAvatar(imageBase64);  // 上传 Base64 字符串到服务器
+            } catch (IOException e) {
+                Toast.makeText(getActivity(), "Failed to load image", Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(getActivity(), "图片选择已取消", Toast.LENGTH_SHORT).show();
         }
@@ -590,65 +618,63 @@ public class PersonalCenterFragment extends Fragment {
     private void updateAvatar(String newAvatarUrl) {
         SharedPreferences sharedPref = requireActivity().getSharedPreferences("user_info", requireContext().MODE_PRIVATE);
         int userId = sharedPref.getInt("user_id", -1);
-        if (userId != -1) {
-            OkHttpClient client = new OkHttpClient();
+        if (userId == -1) {
+            Toast.makeText(requireContext(), "无法获取用户ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            // 构建请求体，包含用户ID和新头像URL
-            JSONObject jsonBody = new JSONObject();
-            try {
-                jsonBody.put("user_id", userId);
-                jsonBody.put("new_avatar", newAvatarUrl);
-            } catch (JSONException e) {
+        OkHttpClient client = new OkHttpClient();
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("user_id", userId);
+            jsonBody.put("new_avatar", newAvatarUrl);
+        } catch (JSONException e) {
+            Toast.makeText(requireContext(), "创建请求数据时出错", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+            return;
+        }
+
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        RequestBody requestBody = RequestBody.create(jsonBody.toString(), JSON);
+
+        Request request = new Request.Builder()
+                .url("http://192.168.68.170:5000/update_avatar")
+                .post(requestBody)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 e.printStackTrace();
-                return;
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(requireContext(), "网络请求失败", Toast.LENGTH_SHORT).show());
             }
 
-            RequestBody requestBody = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
-
-            // 构建 POST 请求
-            Request request = new Request.Builder()
-                    .url("http://192.168.68.170:5000/update_avatar")
-                    .post(requestBody)
-                    .build();
-
-            // 异步执行请求
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    // 处理请求失败
-                    e.printStackTrace();
-                    requireActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(requireContext(), "无法更新用户头像", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    requireActivity().runOnUiThread(() ->
+                            Toast.makeText(requireContext(), "服务器错误：" + response.code(), Toast.LENGTH_SHORT).show());
+                    return;
                 }
 
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                    // 处理服务器响应
-                    final String responseData = response.body().string();
-                    requireActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                JSONObject jsonObject = new JSONObject(responseData);
-                                String message = jsonObject.getString("message");
-                                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
-                                // 如果头像更新成功，重新加载用户头像
-                                if (message.equals("头像更新成功")) {
-                                    loadUserAvatar();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Toast.makeText(requireContext(), "无法更新用户头像", Toast.LENGTH_SHORT).show();
-                            }
+                String responseData = response.body().string();
+                requireActivity().runOnUiThread(() -> {
+                    try {
+                        JSONObject jsonObject = new JSONObject(responseData);
+                        String message = jsonObject.getString("message");
+                        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                        if (message.equals("头像更新成功")) {
+                            loadUserAvatar();  // 假设这是你实现的一个方法来重新加载用户的头像
                         }
-                    });
-                }
-            });
-        }
+                    } catch (JSONException e) {
+                        Toast.makeText(requireContext(), "响应解析失败", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+                });
+            }
+        });
     }
+
 
 }

@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/navigation_diary"
-        android:name="com.example.emotionmanagement.ui.main.fragment.DiaryFragment"
+        android:name="com.example.emotionmanagement.ui.main.diary.DiaryFragment"
         android:label="Diary"
         tools:layout="@layout/fragment_diary" />
 

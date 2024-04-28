@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <!-- 圆形头像 -->
+    <ImageView
+        android:id="@+id/imageViewUserAvatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/img_logo" />
+
+    <!-- 包含昵称和消息的垂直 LinearLayout -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+
+        <!-- 用户昵称 -->
+        <TextView
+            android:id="@+id/textUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:text="用户名"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
+        <!-- 用户消息 -->
+        <TextView
+            android:id="@+id/textMessageUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_user_message"
+            android:text="这里是用户发送的消息内容"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp" />
+    </LinearLayout>
+</LinearLayout>
