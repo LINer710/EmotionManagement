@@ -1,22 +1,16 @@
 package com.example.emotionmanagement.ui.main.diary;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.request.target.Target;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.Nullable;
 
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,14 +19,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.RequestOptions;
 import com.example.emotionmanagement.R;
 
 import java.util.ArrayList;
@@ -47,8 +35,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private String userNickname = "用户"; // 默认昵称
     public static final String KEY_USER_MESSAGES = "user_messages";
     public static final String KEY_SERVER_MESSAGES = "server_messages";
+    private RecyclerView recyclerView; // RecyclerView 的引用
 
-    public ChatAdapter() {
+
+    public ChatAdapter(RecyclerView recyclerView) {
+        this.recyclerView = recyclerView;
         this.messages = new ArrayList<>();
     }
 
@@ -70,6 +61,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         }
         notifyItemInserted(messages.size() - 1);
+
+        // 滚动到最新消息
+        if (recyclerView != null) {
+            recyclerView.smoothScrollToPosition(messages.size() - 1);
+        }
     }
 
 
@@ -86,8 +82,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             notifyItemInserted(lastServerMessageIndex);
         }
     }
-
-
 
 
     public List<String> getUserMessages() {

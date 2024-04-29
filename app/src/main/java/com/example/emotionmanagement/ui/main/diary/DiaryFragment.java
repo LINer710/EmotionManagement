@@ -63,7 +63,7 @@ public class DiaryFragment extends Fragment {
         chatRecyclerView = view.findViewById(R.id.chatRecyclerView);
 
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        chatAdapter = new ChatAdapter();
+        chatAdapter = new ChatAdapter(chatRecyclerView);
         chatRecyclerView.setAdapter(chatAdapter);
 
         btnSend.setOnClickListener(v -> sendMessage());
