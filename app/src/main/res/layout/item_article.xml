@@ -6,7 +6,7 @@
     android:padding="16dp">
 
     <!-- 标题 -->
-    <TextView
+    <com.example.emotionmanagement.util.CustomTextView
         android:id="@+id/text_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
         android:orientation="horizontal">
 
         <!-- 内容 -->
-        <TextView
+        <com.example.emotionmanagement.util.CustomTextView
             android:id="@+id/text_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
                 android:layout_marginRight="4dp"
                 android:src="@drawable/ic_see_close" />
 
-            <TextView
+            <com.example.emotionmanagement.util.CustomTextView
                 android:id="@+id/text_views"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -34,10 +34,13 @@ import okio.BufferedSource;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DiaryFragment extends Fragment {
     private EditText editMessage;
@@ -93,8 +96,9 @@ public class DiaryFragment extends Fragment {
             try {
                 JSONArray userMessagesArray = new JSONArray(userMessagesJson);
                 for (int i = 0; i < userMessagesArray.length(); i++) {
-                    String userMessage = userMessagesArray.getString(i);
-                    userMessages.add(userMessage);
+                    JSONObject messageObject = userMessagesArray.getJSONObject(i);
+                    String messageText = messageObject.getString("text");
+                    userMessages.add(messageText);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -107,8 +111,9 @@ public class DiaryFragment extends Fragment {
             try {
                 JSONArray serverMessagesArray = new JSONArray(serverMessagesJson);
                 for (int i = 0; i < serverMessagesArray.length(); i++) {
-                    String serverMessage = serverMessagesArray.getString(i);
-                    serverMessages.add(serverMessage);
+                    JSONObject messageObject = serverMessagesArray.getJSONObject(i);
+                    String messageText = messageObject.getString("text");
+                    serverMessages.add(messageText);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -137,16 +142,43 @@ public class DiaryFragment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        // 保存用户消息列表
-        JSONArray userMessagesArray = new JSONArray(chatAdapter.getUserMessages());
+        List<String> userMessages = chatAdapter.getUserMessages();
+        JSONArray userMessagesArray = new JSONArray();
+        for (String message : userMessages) {
+            JSONObject messageObject = new JSONObject();
+            try {
+                messageObject.put("text", message);
+                messageObject.put("dateTime", getCurrentDateTime()); // Assuming you have a method to get the current date and time
+                userMessagesArray.put(messageObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         editor.putString(KEY_USER_MESSAGES, userMessagesArray.toString());
 
-        // 保存服务器消息列表
-        JSONArray serverMessagesArray = new JSONArray(chatAdapter.getServerMessages());
+        List<String> serverMessages = chatAdapter.getServerMessages();
+        JSONArray serverMessagesArray = new JSONArray();
+        for (String message : serverMessages) {
+            JSONObject messageObject = new JSONObject();
+            try {
+                messageObject.put("text", message);
+                messageObject.put("dateTime", getCurrentDateTime()); // Assuming you have a method to get the current date and time
+                serverMessagesArray.put(messageObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         editor.putString(KEY_SERVER_MESSAGES, serverMessagesArray.toString());
 
         editor.apply();
     }
+
+    // Method to get current date and time
+    private String getCurrentDateTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
 
 
     private void sendMessage() {

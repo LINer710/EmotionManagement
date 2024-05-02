@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <EditText
+    <com.example.emotionmanagement.util.CustomEditText
         android:id="@+id/editMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,7 +13,7 @@
         android:layout_toLeftOf="@+id/btnSend"
         android:layout_toStartOf="@+id/btnSend" />
 
-    <Button
+    <com.example.emotionmanagement.util.CustomButton
         android:id="@+id/btnSend"
         android:layout_width="wrap_content"
         android:layout_height="40dp"

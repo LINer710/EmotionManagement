@@ -24,7 +24,7 @@
         android:orientation="vertical">
 
         <!-- 用户昵称 -->
-        <TextView
+        <com.example.emotionmanagement.util.CustomTextView
             android:id="@+id/textUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
             android:textSize="12sp" />
 
         <!-- 用户消息 -->
-        <TextView
+        <com.example.emotionmanagement.util.CustomTextView
             android:id="@+id/textMessageServer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
