@@ -6,15 +6,14 @@
     android:padding="16dp">
 
     <!-- 聊天记录按钮 -->
-    <ImageButton
+    <Button
         android:id="@+id/btnChatHistory"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_alignParentRight="true"
         android:layout_marginRight="16dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/button_rounded_bg"
-        android:src="@drawable/ic_chat_history" /> <!-- 替换成你自己的图标 -->
+        android:background="@drawable/ic_chat_history" />
 
     <com.example.emotionmanagement.util.CustomEditText
         android:id="@+id/editMessage"
@@ -43,7 +42,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_above="@id/editMessage"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="1dp" />
 
     <com.example.emotionmanagement.util.DraggableFloatingActionButton
         android:id="@+id/fab"

@@ -163,6 +163,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return messages.size();
     }
 
+    public void clearMessages() {
+        int size = messages.size();
+        if (size > 0) {
+            messages.clear();  // 清空消息列表
+            notifyItemRangeRemoved(0, size);  // 通知 RecyclerView 移除旧数据项
+        }
+    }
+
+
 //    static class UserViewHolder extends RecyclerView.ViewHolder {
 //        private TextView textView;
 //

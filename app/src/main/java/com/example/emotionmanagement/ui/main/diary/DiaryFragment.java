@@ -6,8 +6,8 @@ import static com.example.emotionmanagement.ui.main.diary.ChatAdapter.KEY_USER_M
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,10 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,6 +44,7 @@ import java.util.Locale;
 public class DiaryFragment extends Fragment {
     private EditText editMessage;
     private Button btnSend;
+    private Button btnChatHistory;
     private RecyclerView chatRecyclerView;
     private OkHttpClient client = new OkHttpClient();
     private ChatAdapter chatAdapter;  // 假设您已经创建了这个适配器类
@@ -63,6 +63,7 @@ public class DiaryFragment extends Fragment {
 
         editMessage = view.findViewById(R.id.editMessage);
         btnSend = view.findViewById(R.id.btnSend);
+        btnChatHistory = view.findViewById(R.id.btnChatHistory);
         chatRecyclerView = view.findViewById(R.id.chatRecyclerView);
 
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -76,11 +77,20 @@ public class DiaryFragment extends Fragment {
         fetchUserDetails(userId);
 
         loadMessagesFromSharedPreferences();
-
-
+//        btnChatHistory.setOnClickListener(v -> {
+//            Log.d("CXL", "btnChatHistory");
+//            Intent intent = new Intent(requireContext(), ChatHistoryActivity.class);
+//            startActivity(intent);
+//        });
+        btnChatHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(requireContext(), ChatHistoryActivity.class);
+                startActivity(intent);
+            }
+        });
         return view;
     }
-
 
 
     public void loadMessagesFromSharedPreferences() {
@@ -136,8 +146,6 @@ public class DiaryFragment extends Fragment {
     }
 
 
-
-
     public void saveMessagesToSharedPreferences() {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -178,7 +186,6 @@ public class DiaryFragment extends Fragment {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         return sdf.format(new Date());
     }
-
 
 
     private void sendMessage() {
@@ -285,6 +292,7 @@ public class DiaryFragment extends Fragment {
     private void updateUI(final String message) {
         getActivity().runOnUiThread(() -> chatAdapter.appendServerMessage(message));
     }
+
     private void fetchUserDetails(int userId) {
         fetchAvatar(userId);
         fetchNickname(userId);
