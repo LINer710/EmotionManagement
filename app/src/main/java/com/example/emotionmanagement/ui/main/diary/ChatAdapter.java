@@ -36,6 +36,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final String KEY_USER_MESSAGES = "user_messages";
     public static final String KEY_SERVER_MESSAGES = "server_messages";
     private RecyclerView recyclerView; // RecyclerView 的引用
+    public int lastUserMessageSavedIndex = -1;
+    public int lastServerMessageSavedIndex = -1;
 
 
     public ChatAdapter(RecyclerView recyclerView) {

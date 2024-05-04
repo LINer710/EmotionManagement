@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -150,36 +151,36 @@ public class DiaryFragment extends Fragment {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        List<String> userMessages = chatAdapter.getUserMessages();
-        JSONArray userMessagesArray = new JSONArray();
-        for (String message : userMessages) {
-            JSONObject messageObject = new JSONObject();
-            try {
-                messageObject.put("text", message);
-                messageObject.put("dateTime", getCurrentDateTime()); // Assuming you have a method to get the current date and time
-                userMessagesArray.put(messageObject);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        editor.putString(KEY_USER_MESSAGES, userMessagesArray.toString());
+        try {
+            JSONArray userMessagesArray = new JSONArray(sharedPreferences.getString(KEY_USER_MESSAGES, "[]"));
+            JSONArray serverMessagesArray = new JSONArray(sharedPreferences.getString(KEY_SERVER_MESSAGES, "[]"));
 
-        List<String> serverMessages = chatAdapter.getServerMessages();
-        JSONArray serverMessagesArray = new JSONArray();
-        for (String message : serverMessages) {
-            JSONObject messageObject = new JSONObject();
-            try {
-                messageObject.put("text", message);
-                messageObject.put("dateTime", getCurrentDateTime()); // Assuming you have a method to get the current date and time
-                serverMessagesArray.put(messageObject);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        editor.putString(KEY_SERVER_MESSAGES, serverMessagesArray.toString());
+            // 获取当前列表中的消息并进行增量保存
+            List<String> currentUserMessages = chatAdapter.getUserMessages();
+            List<String> currentServerMessages = chatAdapter.getServerMessages();
 
-        editor.apply();
+            addNewMessagesIncrementally(userMessagesArray, currentUserMessages);
+            addNewMessagesIncrementally(serverMessagesArray, currentServerMessages);
+
+            editor.putString(KEY_USER_MESSAGES, userMessagesArray.toString());
+            editor.putString(KEY_SERVER_MESSAGES, serverMessagesArray.toString());
+            editor.apply();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
+
+    private void addNewMessagesIncrementally(JSONArray messagesArray, List<String> currentMessages) throws JSONException {
+        int startFromIndex = messagesArray.length();
+        for (int i = startFromIndex; i < currentMessages.size(); i++) {
+            JSONObject messageObject = new JSONObject();
+            messageObject.put("text", currentMessages.get(i));
+            messageObject.put("dateTime", getCurrentDateTime()); // 当前实现依赖于每次保存时生成新的时间戳
+            messagesArray.put(messageObject);
+        }
+    }
+
+
 
     // Method to get current date and time
     private String getCurrentDateTime() {
