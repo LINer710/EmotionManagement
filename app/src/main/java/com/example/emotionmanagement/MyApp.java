@@ -6,6 +6,8 @@ import android.graphics.Typeface;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.jakewharton.threetenabp.AndroidThreeTen;
+
 public class MyApp extends Application {
     private static final String PREFS_NAME = "FontPrefs";
     private static final String KEY_FONT_PATH = "fontPath";
@@ -21,6 +23,8 @@ public class MyApp extends Application {
         context = getApplicationContext(); // Assign context
         preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         loadCustomFont();
+        AndroidThreeTen.init(this);
+
     }
 
     public static Typeface getCustomFont() {

@@ -1,18 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingTop="40dp">
 
     <!-- CalendarView 配置 -->
-    <CalendarView
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/calendarView"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:layout_alignParentTop="true"
-        android:background="#ffffff"
-        android:firstDayOfWeek="1"
-        android:scrollbars="none"
-        android:showWeekNumber="false" />
+        android:layout_marginHorizontal="16dp"
+        android:background="@drawable/rounded_background"
+        app:mcv_firstDayOfWeek="sunday"
+        app:mcv_showOtherDates="none" />
 
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_background"
+        android:layout_marginHorizontal="16dp"
+        android:orientation="vertical">
+
+
+        <com.example.emotionmanagement.util.CustomTextView
+            android:id="@+id/tvScoreRecommendationTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="8dp"
+            android:text="情绪变化趋势图"
+            android:textSize="20sp" />
+
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="20dp" />
+
+    </LinearLayout>
+</LinearLayout>
