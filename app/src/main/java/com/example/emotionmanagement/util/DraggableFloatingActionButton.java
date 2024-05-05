@@ -33,37 +33,39 @@ public class DraggableFloatingActionButton extends FloatingActionButton implemen
     @Override
     public boolean onTouch(View view, MotionEvent event) {
         int action = event.getAction();
-        if (action == MotionEvent.ACTION_DOWN) {
-            downRawX = (int) event.getRawX();
-            downRawY = (int) event.getRawY();
-            dX = (int) (view.getX() - event.getRawX());
-            dY = (int) (view.getY() - event.getRawY());
-            return true;
-        } else if (action == MotionEvent.ACTION_MOVE) {
-            int viewWidth = view.getWidth();
-            int viewHeight = view.getHeight();
-            View viewParent = (View) view.getParent();
-            int parentWidth = viewParent.getWidth();
-            int parentHeight = viewParent.getHeight();
-            int newX = (int) event.getRawX() + dX;
-            int newY = (int) event.getRawY() + dY;
-            if (newX < 0) {
-                newX = 0;
-            } else if (newX > parentWidth - viewWidth) {
-                newX = parentWidth - viewWidth;
-            }
-            if (newY < 0) {
-                newY = 0;
-            } else if (newY > parentHeight - viewHeight) {
-                newY = parentHeight - viewHeight;
-            }
-            view.animate()
-                    .x(newX)
-                    .y(newY)
-                    .setDuration(0)
-                    .start();
-            return true;
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                downRawX = (int) event.getRawX();
+                downRawY = (int) event.getRawY();
+                dX = (int) (view.getX() - event.getRawX());
+                dY = (int) (view.getY() - event.getRawY());
+                return true;
+
+            case MotionEvent.ACTION_MOVE:
+                int newX = (int) event.getRawX() + dX;
+                int newY = (int) event.getRawY() + dY;
+
+                view.animate()
+                        .x(newX)
+                        .y(newY)
+                        .setDuration(0)
+                        .start();
+                return true;
+
+            case MotionEvent.ACTION_UP:
+                int upRawX = (int) event.getRawX();
+                int upRawY = (int) event.getRawY();
+                int upDX = upRawX - downRawX;
+                int upDY = upRawY - downRawY;
+
+                if (Math.abs(upDX) < 10 && Math.abs(upDY) < 10) {  // 判断手指移动的距离是否很小
+                    // 手指移动距离小，认为是点击
+                    view.performClick();
+                }
+                return true;
         }
         return false;
     }
+
+
 }

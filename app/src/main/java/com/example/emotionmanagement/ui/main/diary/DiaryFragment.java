@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.emotionmanagement.R;
+import com.example.emotionmanagement.util.DraggableFloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,6 +47,7 @@ public class DiaryFragment extends Fragment {
     private EditText editMessage;
     private Button btnSend;
     private Button btnChatHistory;
+    private DraggableFloatingActionButton btnAnalysis;
     private RecyclerView chatRecyclerView;
     private OkHttpClient client = new OkHttpClient();
     private ChatAdapter chatAdapter;  // 假设您已经创建了这个适配器类
@@ -65,6 +67,7 @@ public class DiaryFragment extends Fragment {
         editMessage = view.findViewById(R.id.editMessage);
         btnSend = view.findViewById(R.id.btnSend);
         btnChatHistory = view.findViewById(R.id.btnChatHistory);
+        btnAnalysis = view.findViewById(R.id.fab);
         chatRecyclerView = view.findViewById(R.id.chatRecyclerView);
 
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -90,6 +93,20 @@ public class DiaryFragment extends Fragment {
                 startActivity(intent);
             }
         });
+        btnAnalysis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent = new Intent(getActivity(), ChatSemanticAnalysisActivity.class);
+                        startActivity(intent);
+                    }
+                });
+            }
+        });
+
+
         return view;
     }
 
@@ -103,6 +120,7 @@ public class DiaryFragment extends Fragment {
 
         // 从SharedPreferences中加载用户消息
         String userMessagesJson = sharedPreferences.getString(KEY_USER_MESSAGES, null);
+        Log.d("CXL", "loadMessagesFromSharedPreferences"+userMessagesJson);
         if (userMessagesJson != null) {
             try {
                 JSONArray userMessagesArray = new JSONArray(userMessagesJson);
@@ -179,7 +197,6 @@ public class DiaryFragment extends Fragment {
             messagesArray.put(messageObject);
         }
     }
-
 
 
     // Method to get current date and time
