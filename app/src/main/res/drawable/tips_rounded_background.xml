@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:startColor="#FFFFFF"
+        android:endColor="#c7e1f3"
+        android:angle="0"/> <!-- angle设置为0表示横向渐变 -->
+    <corners android:radius="10dp"/> <!-- 设置圆角半径 -->
+    <padding
+        android:left="10dp"
+        android:top="10dp"
+        android:right="10dp"
+        android:bottom="10dp"/> <!-- 可选的内部间距 -->
+</shape>

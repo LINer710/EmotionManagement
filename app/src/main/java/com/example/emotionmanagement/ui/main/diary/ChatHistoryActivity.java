@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -16,6 +17,9 @@ import com.example.emotionmanagement.R;
 
 
 import android.util.Log;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.emotionmanagement.util.DateAxisValueFormatter;
@@ -45,6 +49,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Random;
 
 import okhttp3.Call;
@@ -59,6 +64,12 @@ public class ChatHistoryActivity extends AppCompatActivity {
     private MaterialCalendarView calendarView;
     private int userId;
     private LineChart lineChart;
+
+    private MediaPlayer mediaPlayer;
+    private ImageButton btnPlayPause;
+    private SeekBar seekBarMusic;
+    private TextView tvCurrentTime, tvTotalTime;
+    private boolean isPlaying = false;
 
 
     @Override
@@ -97,9 +108,98 @@ public class ChatHistoryActivity extends AppCompatActivity {
         fetchSentimentResults();
         fetchSentimentScoreResults();
 
+        // 初始化播放器
+        initMediaPlayer();
+
+        btnPlayPause = findViewById(R.id.btnPlayPause);
+        seekBarMusic = findViewById(R.id.seekBarMusic);
+        tvCurrentTime = findViewById(R.id.tvCurrentTime);
+//        tvTotalTime = findViewById(R.id.tvTotalTime);
+        btnPlayPause.setOnClickListener(v -> togglePlayPause());
+        seekBarMusic.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mediaPlayer.seekTo(progress);
+                    updateCurrentTimeDisplay(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Not used
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Not used
+            }
+        });
+
+//        updateTotalTimeDisplay();
 
     }
+    private void initMediaPlayer() {
+        mediaPlayer = MediaPlayer.create(this, R.raw.music1);  // Change to your music file
+        mediaPlayer.setOnCompletionListener(mp -> {
+            btnPlayPause.setImageResource(R.drawable.ic_play);  // Change to your play icon
+            isPlaying = false;
+        });
+        mediaPlayer.setOnPreparedListener(mp -> {
+            seekBarMusic.setMax(mediaPlayer.getDuration());
+//            updateTotalTimeDisplay();
+        });
+    }
 
+    private void togglePlayPause() {
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            btnPlayPause.setImageResource(R.drawable.ic_play);  // Change to your play icon
+            isPlaying = false;
+        } else {
+            mediaPlayer.start();
+            btnPlayPause.setImageResource(R.drawable.ic_pause);  // Change to your pause icon
+            isPlaying = true;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mediaPlayer != null && isPlaying) {
+                        int mCurrentPosition = mediaPlayer.getCurrentPosition();
+                        seekBarMusic.setProgress(mCurrentPosition);
+                        updateCurrentTimeDisplay(mCurrentPosition);
+                        seekBarMusic.postDelayed(this, 1000);
+                    }
+                }
+            });
+        }
+    }
+
+//    private void updateTotalTimeDisplay() {
+//        int duration = mediaPlayer.getDuration();
+//        tvTotalTime.setText(formatTime(duration));
+//    }
+
+    private void updateCurrentTimeDisplay(int currentTime) {
+        tvCurrentTime.setText(formatTime(currentTime));
+    }
+
+    private String formatTime(int time) {
+        int seconds = (time / 1000) % 60;
+        int minutes = (time / (1000 * 60)) % 60;
+        return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+            }
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
     private void fetchSentimentScoreResults() {
         OkHttpClient client = new OkHttpClient();
         String url = "http://172.20.10.3:5000/get_latest_daily_sentiment?user_id=" + userId;

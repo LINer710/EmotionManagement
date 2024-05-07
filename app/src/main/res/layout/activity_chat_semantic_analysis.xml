@@ -10,20 +10,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_gravity="center_horizontal"
         android:layout_marginHorizontal="16dp"
-        android:background="@drawable/rounded_background">
+        android:background="@drawable/rounded_background"
+        android:orientation="vertical">
 
         <!-- 语义分析得分标题 -->
         <com.example.emotionmanagement.util.CustomTextView
             android:id="@+id/tvScoreTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="今日情绪分析得分"
-            android:textSize="20sp"
             android:layout_gravity="center_horizontal"
-            android:padding="8dp" />
+            android:padding="8dp"
+            android:text="今日情绪分析得分"
+            android:textSize="20sp" />
 
         <!-- 环形进度条容器 -->
         <FrameLayout
@@ -52,41 +52,78 @@
                 android:textStyle="bold" />
         </FrameLayout>
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:orientation="vertical"
         android:layout_gravity="center_horizontal"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="20dp"
-        android:background="@drawable/rounded_background">
+        android:background="@drawable/rounded_background"
+        android:orientation="vertical">
 
         <!-- 情感分析推荐标题 -->
         <com.example.emotionmanagement.util.CustomTextView
             android:id="@+id/tvRecommendationTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="对话积极消极对比图"
-            android:textSize="20sp"
             android:layout_gravity="center_horizontal"
-            android:padding="8dp" />
+            android:padding="8dp"
+            android:text="对话积极消极对比图"
+            android:textSize="20sp" />
 
-    <!-- 情感分柱状图 -->
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/chart"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="24dp" />
+        <!-- 情感分柱状图 -->
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="24dp"
+            android:layout_weight="1" />
     </LinearLayout>
 
     <!-- 情感推荐话语 -->
-    <TextView
-        android:id="@+id/tvRecommendation"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:padding="8dp"
-        android:text="建议增强正面表达，减少负面情绪。"
-        android:textSize="16sp" />
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_background"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- 情感分析推荐标题和图标的容器 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.example.emotionmanagement.util.CustomTextView
+                android:id="@+id/tvTipsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="情绪小贴士"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- 图标 -->
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_tips" /> <!-- 替换为你的图标资源 -->
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvRecommendation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="8dp"
+            android:text="建议增强正面表达，减少负面情绪。"
+            android:textSize="16sp" />
+    </LinearLayout>
+
 </LinearLayout>

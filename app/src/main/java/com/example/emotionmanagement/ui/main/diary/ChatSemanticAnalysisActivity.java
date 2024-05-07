@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -96,8 +97,6 @@ public class ChatSemanticAnalysisActivity extends AppCompatActivity {
     }
 
 
-
-
     private void fetchTodayUserMessagesAndAnalyze(SharedPreferences sharedPreferences, int userId) {
         String userMessagesJson = sharedPreferences.getString(KEY_USER_MESSAGES, null);
         Log.d("CXL", "userMessagesJson: " + userMessagesJson);
@@ -123,7 +122,7 @@ public class ChatSemanticAnalysisActivity extends AppCompatActivity {
 
         // Join all today's messages into a single string for analysis
         String allTodayMessages = TextUtils.join(" ", todayMessages);
-        Log.d("CXL", "allTodayMessages"+allTodayMessages);
+        Log.d("CXL", "allTodayMessages" + allTodayMessages);
         if (!allTodayMessages.isEmpty()) {
             fetchSentimentAnalysis(String.valueOf(userId), allTodayMessages);
         }
@@ -138,7 +137,7 @@ public class ChatSemanticAnalysisActivity extends AppCompatActivity {
 
             RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), jsonData.toString());
             Request request = new Request.Builder()
-                    .url(URL+"/analyze_sentiment") // 根据你的服务器地址进行修改
+                    .url(URL + "/analyze_sentiment") // 根据你的服务器地址进行修改
                     .post(body)
                     .build();
 
@@ -202,7 +201,51 @@ public class ChatSemanticAnalysisActivity extends AppCompatActivity {
 
         chart.setData(data);
         chart.invalidate(); // refresh the chart
+
+        fetchEmotionAdvice(score); // Fetch emotion advice based on the score
+
     }
+
+    private void fetchEmotionAdvice(double score) {
+        OkHttpClient client = new OkHttpClient();
+        String url = "http://172.20.10.3:5000/get_emotion_advice?sentiment_score=" + score;
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> Toast.makeText(ChatSemanticAnalysisActivity.this, "Failed to fetch emotion advice", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    final String responseData = response.body().string();
+                    runOnUiThread(() -> updateEmotionAdvice(responseData));
+                } else {
+                    runOnUiThread(() -> Toast.makeText(ChatSemanticAnalysisActivity.this, "Error fetching emotion advice", Toast.LENGTH_SHORT).show());
+                }
+            }
+        });
+    }
+
+    private void updateEmotionAdvice(String jsonData) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            final String advice = jsonObject.getString("emotion_advice");
+
+            runOnUiThread(() -> {
+                TextView tvRecommendation = findViewById(R.id.tvRecommendation);
+                tvRecommendation.setText(advice);
+            });
+        } catch (JSONException e) {
+            runOnUiThread(() -> Toast.makeText(this, "Error parsing JSON: " + e.getMessage(), Toast.LENGTH_LONG).show());
+        }
+    }
+
 
 
 }
